@@ -1,4 +1,4 @@
-     /* File Name: T02CLOCK.C 
+ /* File Name: T03POLE.C 
  * Programmer: RA3
  * DATE: 03.05.2016
  */
@@ -34,22 +34,45 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
   }
 
   /* Create window */
-  hWnd = CreateWindow(WND_CLASS_NAME, "LocalTime", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInstance, NULL);
+  hWnd = CreateWindow(WND_CLASS_NAME, "LocalTime", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
+    CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInstance, NULL);
   if (hWnd == NULL)
   {
     MessageBox(NULL, "Create window error", "ERROR", MB_OK | MB_ICONERROR);
     return 0;
   }
-
   /* Show window */
   ShowWindow(hWnd, CmdShow);
   /* Run message loop */
   while (GetMessage(&msg, NULL, 0, 0))
     DispatchMessage(&msg);
-
   return 0;
 } 
 /* End of "WinMain" function */
+/* Start of "Draw" fuction */
+VOID Draw(HDC hDC, INT X, INT Y, DOUBLE A)
+{ 
+  INT i;
+  DOUBLE rad = A * 3.14159265358979 / 180, si = sin(rad), co = cos(rad);
+  static POINT pt[]=
+  {
+    {-10, 0}, {10, 50}, {10, 50}, {10, 0}
+  };
+  static POINT pt1[sizeof (pt) / sizeof(pt[0])];
+
+  for (i = 0; i < sizeof (pt) / sizeof(pt[0]); i++)
+  {
+    pt1[i].x = X + pt[i].x * co - pt[i].y * si;
+    pt1[i].y = Y + pt[i].x * si + pt[i].y * co;
+  }
+  SelectObject(hDC, GetStockObject(DC_PEN));
+  SelectObject(hDC, GetStockObject(DC_BRUSH));
+  SetDCPenColor(hDC, RGB(255, 0, 0));
+  SetDCBrushColor(hDC, RGB(0, 0, 0));
+  Polygon(hDC, pt1, sizeof(pt) / sizeof(pt[0]));
+}
+/* End of "Draw" function */
+
 
 /* Start of "MyWinFunc" function */
 LRESULT CALLBACK MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
@@ -66,7 +89,7 @@ LRESULT CALLBACK MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
   static HBITMAP hBm, hBmLogo;
   static HDC hMemDC, hMemDCLogo;
 
-    switch (Msg)
+  switch (Msg)
   {
   case WM_CREATE:
     SetTimer(hWnd, 30, 10, NULL);
@@ -94,10 +117,11 @@ LRESULT CALLBACK MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     Rectangle(hMemDC, 0, 0, w + 1, h + 1);
     BitBlt(hMemDC, (w - bm.bmWidth) / 2, (h - bm.bmHeight)/ 2, bm.bmWidth,
       bm.bmHeight, hMemDCLogo, 0, 0, SRCCOPY);
-    GetLocalTime(&t);
-   
-    hPen = CreatePen(PS_SOLID, 3, RGB(0, 255, 0));                /* Color Of Hands */
 
+    
+
+    GetLocalTime(&t); 
+    hPen = CreatePen(PS_SOLID, 3, RGB(0, 255, 0));                /* Color Of Hands */
     SelectObject(hMemDC, hPen);
     a = (t.wSecond * 2 * 3.14159265358979 / 60);
     r = (bm.bmWidth / 2.2);                                       /* Second: Hande */ 
@@ -122,7 +146,8 @@ LRESULT CALLBACK MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     TextOut(hMemDCLogo, 0, 550, s, sprintf(s, "0%i.0%i.%i", t.wDay, t.wMonth, t.wYear));
 
     SetTextColor(hMemDC, RGB(255, 0, 0));
-    TextOut(hMemDC, 30, 30, "Clock", 5);
+    TextOut(hMemDC, 30, 30, "Current Time is on the picture", 5);
+    Draw(hMemDC, 90, 90, 200);
     InvalidateRect(hWnd, NULL, FALSE);
     return 30;
   case WM_PAINT:                                                             

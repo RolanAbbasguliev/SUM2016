@@ -1,4 +1,4 @@
-     /* File Name: T02CLOCK.C 
+ /* File Name: T03POLE.C 
  * Programmer: RA3
  * DATE: 03.05.2016
  */
@@ -54,8 +54,8 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
 /* Start of "MyWinFunc" function */
 LRESULT CALLBACK MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
 {
-  HPEN hPen, hOld;
   HDC hDC;
+  HPEN hPen, hOld;
   PAINTSTRUCT ps;
   SYSTEMTIME t;
   DOUBLE a, r;
@@ -95,25 +95,23 @@ LRESULT CALLBACK MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     BitBlt(hMemDC, (w - bm.bmWidth) / 2, (h - bm.bmHeight)/ 2, bm.bmWidth,
       bm.bmHeight, hMemDCLogo, 0, 0, SRCCOPY);
     GetLocalTime(&t);
-   
-    hPen = CreatePen(PS_SOLID, 3, RGB(0, 255, 0));                /* Color Of Hands */
+    
 
+    hPen = CreatePen(PS_SOLID, 2, RGB(255, 0, 0));
     SelectObject(hMemDC, hPen);
     a = (t.wSecond * 2 * 3.14159265358979 / 60);
-    r = (bm.bmWidth / 2.2);                                       /* Second: Hande */ 
+    r = (bm.bmWidth / 2.2);                                       /* Second: line */ 
     MoveToEx(hMemDC, w / 2, h /2, NULL);
     LineTo(hMemDC, w / 2 + sin(a) * r, h / 2 - cos(a) * r);
-    DeleteObject(hPen);
-    
     
     
     a = ((t.wMinute + t.wSecond / 60.0) * 2 * 3.14159265358979 / 60);
-    r = (bm.bmWidth / 3.2);                                       /* Minute: Hande */
+    r = (bm.bmWidth / 3.2);                                       /* Minute: line */
     MoveToEx(hMemDC, w / 2, h /2, NULL);                           
     LineTo(hMemDC, w / 2 + sin(a) * r, h / 2 - cos(a) * r);
 
     a = ((t.wHour % 12 + t.wMinute / 60.0) * 2 * 3.14159265358979 / 12);
-    r = (bm.bmWidth / 4.2);                                       /* Hour: Hande */
+    r = (bm.bmWidth / 4.2);                                       /* Hour: line */
     MoveToEx(hMemDC, w / 2, h /2, NULL);
     LineTo(hMemDC, w / 2 + sin(a) * r, h / 2 - cos(a) * r);
 
@@ -121,8 +119,16 @@ LRESULT CALLBACK MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     SetTextColor(hMemDC, RGB(123, 0, 125));
     TextOut(hMemDCLogo, 0, 550, s, sprintf(s, "0%i.0%i.%i", t.wDay, t.wMonth, t.wYear));
 
-    SetTextColor(hMemDC, RGB(255, 0, 0));
+
     TextOut(hMemDC, 30, 30, "Clock", 5);
+
+    hFnt = CreateFont( 10, 0, 0, 0, 0, FALSE, FALSE, FALSE, RUSSIAN_CHARSET, OUT_DEFAULT_PRECIS,
+      CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FIXED_PITCH, "Bookman Old Style");
+    SelectObject(hDC, hFnt);
+    TextOut(hMemDC, 100, 50, "Clock", 5);
+    DeleteObject(hFnt);
+
+
     InvalidateRect(hWnd, NULL, FALSE);
     return 30;
   case WM_PAINT:                                                             

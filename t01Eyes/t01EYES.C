@@ -5,6 +5,7 @@
 #include <windows.h>
 #include <math.h>
 #include <stdlib.h>
+#pragma warning(disable: 4244) 
 
 #define WND_CLASS_NAME "My Window Class"
 
@@ -68,7 +69,6 @@ VOID DrawEye(HWND hWnd, INT x, INT y, INT R, INT R1, HDC hDC)
     dx *= t;
     dy *= t;
   }
-
   Ellipse(hDC, x - R, y - R, x + R, y + R);
   Ellipse(hDC, x + dx - R1, y + dy - R1, x + dx + R1, y + dy + R1);
 }
@@ -80,7 +80,6 @@ LRESULT CALLBACK MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
   INT i;
   HDC hDC;
   PAINTSTRUCT ps;
-  HBRUSG
   static INT w, h;
   static BITMAP bm;
   static HBITMAP hBm;
@@ -107,7 +106,6 @@ LRESULT CALLBACK MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     return 0;
   case WM_TIMER:
     Rectangle(hMemDC, 0, 0, w + 1, h + 1);
-    
     DrawEye(hWnd, 400, 400, 200, 50, hMemDC);
     DrawEye(hWnd, 800, 400, 200, 50, hMemDC);
     SetBkMode(hMemDC, TRANSPARENT);
@@ -125,6 +123,8 @@ LRESULT CALLBACK MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     DeleteDC(hMemDC);
     DeleteObject(hBm);
     PostQuitMessage(0);
+    return 0;
+  case WM_ERASEBKGND:
     return 0;
   }
   return DefWindowProc(hWnd, Msg, wParam, lParam);
