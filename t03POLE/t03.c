@@ -4,6 +4,9 @@
  */
 #include <windows.h>
 #include <math.h>
+#include <time.h>
+#include <stdlib.h>
+
 #pragma warning(disable: 4244) 
 
 #define WND_CLASS_NAME "My Window Class"
@@ -47,42 +50,101 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
   while (GetMessage(&msg, NULL, 0, 0))
     DispatchMessage(&msg);
   return 0;
-} 
-/* End of "WinMain" function */
-/* Start of "Draw" fuction */
-VOID Draw(HDC hDC, INT X, INT Y, DOUBLE A)
-{ 
-  INT i;
-  DOUBLE rad = A * 3.14159265358979 / 180, si = sin(rad), co = cos(rad);
-  static POINT pt[]=
+}/* End of "WinMain" function */
+       
+/* Set/reset full screen mode function */
+VOID FlipFullScreen( HWND hWnd )      
+{
+  static BOOL IsFullScreen = FALSE;
+  static RECT SaveRect;
+                                                      
+  if (IsFullScreen)
   {
-    {-10, 0}, {10, 50}, {10, 50}, {10, 0}
+    /* Restore window size */                                     
+    SetWindowPos(hWnd, HWND_TOP,
+      SaveRect.left, SaveRect.top,                                  
+      SaveRect.right - SaveRect.left, SaveRect.bottom - SaveRect.top  ,
+      SWP_NOOWNERZORDER);
+  }
+  else
+  {
+    /* Set full screen size to window */
+    HMONITOR hmon;
+    MONITORINFOEX moninfo;
+    RECT rc;
+                        
+    /* Store window old size */
+    GetWindowRect(hWnd, &SaveRect);
+
+    /* Get nearest monitor */
+    hmon = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+
+    /* Obtain monitor info */
+    moninfo.cbSize = sizeof(moninfo);
+    GetMonitorInfo(hmon, (MONITORINFO *)&moninfo);
+
+    /* Set window new size */
+    rc = moninfo.rcMonitor;
+    AdjustWindowRect(&rc, GetWindowLong(hWnd, GWL_STYLE), FALSE);
+
+    SetWindowPos(hWnd, HWND_TOPMOST,
+      rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top,
+      SWP_NOOWNERZORDER);
+  }
+  IsFullScreen = !IsFullScreen;
+} /* End of 'FlipFullScreen' function */
+
+/* Start of "Draw" fuction */
+VOID Draw( HDC hDC, INT X, INT Y, POINT Pts )
+{ 
+  INT i, dx, dy;
+  DOUBLE len, si, co;
+  static POINT pt[] =
+  {
+    {-10, 50}, {-40, 100}, {300, 30} 
   };
-  static POINT pt1[sizeof (pt) / sizeof(pt[0])];
+  POINT pt1[sizeof (pt) / sizeof(pt[0])];
+
+  dx = (Pts.x - X);
+  dy = (Pts.y - Y);
+  len = sqrt(dx * dx + dy * dy);
+  si = dy / len;
+  co = dx / len;
 
   for (i = 0; i < sizeof (pt) / sizeof(pt[0]); i++)
-  {
+  {                                  
     pt1[i].x = X + pt[i].x * co - pt[i].y * si;
-    pt1[i].y = Y + pt[i].x * si + pt[i].y * co;
+    pt1[i].y = Y + (pt[i].x * si + pt[i].y * co);
   }
   SelectObject(hDC, GetStockObject(DC_PEN));
+  SetDCPenColor(hDC, RGB(rand(), rand(), rand()));
   SelectObject(hDC, GetStockObject(DC_BRUSH));
-  SetDCPenColor(hDC, RGB(255, 0, 0));
-  SetDCBrushColor(hDC, RGB(0, 0, 0));
-  Polygon(hDC, pt1, sizeof(pt) / sizeof(pt[0]));
+  SetDCBrushColor(hDC, RGB(rand(), rand(), rand()));
+  Polygon(hDC, pt1, sizeof(pt1) / sizeof(pt1[0]));
 }
-/* End of "Draw" function */
 
+/* Draw cursor trail image function */
+VOID DrawTrail( HWND hWnd, HDC hDC )
+{
+  POINT p;
+  INT i;
+
+  GetCursorPos(&p);
+  ScreenToClient(hWnd, &p);
+  srand(30);
+  for (i = 0; i < 300; i++)
+    Draw(hDC, rand() % 2000, rand() % 1000, p);
+}
 
 /* Start of "MyWinFunc" function */
 LRESULT CALLBACK MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
 {
-  HPEN hPen, hOld;
   HDC hDC;
   PAINTSTRUCT ps;
   SYSTEMTIME t;
   DOUBLE a, r;
   CHAR s[300];
+  INT i;
   HFONT hFnt;
   static INT w, h;
   static BITMAP bm;
@@ -93,13 +155,8 @@ LRESULT CALLBACK MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
   {
   case WM_CREATE:
     SetTimer(hWnd, 30, 10, NULL);
-    hBmLogo = LoadImage(NULL, "h.bmp", IMAGE_BITMAP, 550, 600, LR_LOADFROMFILE);
-    GetObject(hBmLogo, sizeof(bm), &bm);
-    
     hDC = GetDC(hWnd);
     hMemDC = CreateCompatibleDC(hDC);
-    hMemDCLogo = CreateCompatibleDC(hDC);
-    SelectObject(hMemDCLogo, hBmLogo);
     ReleaseDC(hWnd, hDC);
     return 0;
   case WM_SIZE:
@@ -115,39 +172,11 @@ LRESULT CALLBACK MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     return 0;
   case WM_TIMER:
     Rectangle(hMemDC, 0, 0, w + 1, h + 1);
-    BitBlt(hMemDC, (w - bm.bmWidth) / 2, (h - bm.bmHeight)/ 2, bm.bmWidth,
+    BitBlt(hMemDC, (w - bm.bmWidth) / 2, (h - bm.bmHeight) / 2, bm.bmWidth,
       bm.bmHeight, hMemDCLogo, 0, 0, SRCCOPY);
 
-    
+    DrawTrail(hWnd, hMemDC);
 
-    GetLocalTime(&t); 
-    hPen = CreatePen(PS_SOLID, 3, RGB(0, 255, 0));                /* Color Of Hands */
-    SelectObject(hMemDC, hPen);
-    a = (t.wSecond * 2 * 3.14159265358979 / 60);
-    r = (bm.bmWidth / 2.2);                                       /* Second: Hande */ 
-    MoveToEx(hMemDC, w / 2, h /2, NULL);
-    LineTo(hMemDC, w / 2 + sin(a) * r, h / 2 - cos(a) * r);
-    DeleteObject(hPen);
-    
-    
-    
-    a = ((t.wMinute + t.wSecond / 60.0) * 2 * 3.14159265358979 / 60);
-    r = (bm.bmWidth / 3.2);                                       /* Minute: Hande */
-    MoveToEx(hMemDC, w / 2, h /2, NULL);                           
-    LineTo(hMemDC, w / 2 + sin(a) * r, h / 2 - cos(a) * r);
-
-    a = ((t.wHour % 12 + t.wMinute / 60.0) * 2 * 3.14159265358979 / 12);
-    r = (bm.bmWidth / 4.2);                                       /* Hour: Hande */
-    MoveToEx(hMemDC, w / 2, h /2, NULL);
-    LineTo(hMemDC, w / 2 + sin(a) * r, h / 2 - cos(a) * r);
-
-    SetBkMode(hMemDC, TRANSPARENT);  
-    SetTextColor(hMemDC, RGB(123, 0, 125));
-    TextOut(hMemDCLogo, 0, 550, s, sprintf(s, "0%i.0%i.%i", t.wDay, t.wMonth, t.wYear));
-
-    SetTextColor(hMemDC, RGB(255, 0, 0));
-    TextOut(hMemDC, 30, 30, "Current Time is on the picture", 5);
-    Draw(hMemDC, 90, 90, 200);
     InvalidateRect(hWnd, NULL, FALSE);
     return 30;
   case WM_PAINT:                                                             
@@ -167,5 +196,4 @@ LRESULT CALLBACK MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
   return DefWindowProc(hWnd, Msg, wParam, lParam);
 } /* End of "MyWinFunc" function */
 
-/* End of file */
 

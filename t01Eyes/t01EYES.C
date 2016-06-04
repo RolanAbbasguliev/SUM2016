@@ -5,6 +5,7 @@
 #include <windows.h>
 #include <math.h>
 #include <stdlib.h>
+#include <time.h>
 #pragma warning(disable: 4244) 
 
 #define WND_CLASS_NAME "My Window Class"
@@ -69,6 +70,7 @@ VOID DrawEye(HWND hWnd, INT x, INT y, INT R, INT R1, HDC hDC)
     dx *= t;
     dy *= t;
   }
+  
   Ellipse(hDC, x - R, y - R, x + R, y + R);
   Ellipse(hDC, x + dx - R1, y + dy - R1, x + dx + R1, y + dy + R1);
 }
@@ -106,6 +108,8 @@ LRESULT CALLBACK MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     return 0;
   case WM_TIMER:
     Rectangle(hMemDC, 0, 0, w + 1, h + 1);
+
+ 
     DrawEye(hWnd, 400, 400, 200, 50, hMemDC);
     DrawEye(hWnd, 800, 400, 200, 50, hMemDC);
     SetBkMode(hMemDC, TRANSPARENT);

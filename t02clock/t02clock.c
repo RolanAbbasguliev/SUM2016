@@ -117,7 +117,7 @@ LRESULT CALLBACK MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     MoveToEx(hMemDC, w / 2, h /2, NULL);
     LineTo(hMemDC, w / 2 + sin(a) * r, h / 2 - cos(a) * r);
 
-    SetBkMode(hMemDC, TRANSPARENT);  
+    SetBkMode(hMemDC, TRANSPARENT);
     SetTextColor(hMemDC, RGB(123, 0, 125));
     TextOut(hMemDCLogo, 0, 550, s, sprintf(s, "0%i.0%i.%i", t.wDay, t.wMonth, t.wYear));
 
