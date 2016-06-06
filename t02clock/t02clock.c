@@ -96,7 +96,7 @@ LRESULT CALLBACK MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
       bm.bmHeight, hMemDCLogo, 0, 0, SRCCOPY);
     GetLocalTime(&t);
    
-    hPen = CreatePen(PS_SOLID, 3, RGB(0, 255, 0));                /* Color Of Hands */
+    hPen = CreatePen(PS_GEOMETRIC, 3, RGB(0, 255, 0));                /* Color Of Hands */
 
     SelectObject(hMemDC, hPen);
     a = (t.wSecond * 2 * 3.14159265358979 / 60);

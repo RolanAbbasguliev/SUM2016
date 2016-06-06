@@ -50,7 +50,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine,
   while (GetMessage(&msg, NULL, 0, 0))
     DispatchMessage(&msg);
   return 0;
-}/* End of "WinMain" function */
+}/* End of 'WinMain' function */
        
 /* Set/reset full screen mode function */
 VOID FlipFullScreen( HWND hWnd )      
@@ -64,7 +64,7 @@ VOID FlipFullScreen( HWND hWnd )
     SetWindowPos(hWnd, HWND_TOP,
       SaveRect.left, SaveRect.top,                                  
       SaveRect.right - SaveRect.left, SaveRect.bottom - SaveRect.top  ,
-      SWP_NOOWNERZORDER);
+      SWP_NOOWNERZORDER);                      
   }
   else
   {
@@ -94,14 +94,14 @@ VOID FlipFullScreen( HWND hWnd )
   IsFullScreen = !IsFullScreen;
 } /* End of 'FlipFullScreen' function */
 
-/* Start of "Draw" fuction */
+/* Start of 'Draw' fuction */
 VOID Draw( HDC hDC, INT X, INT Y, POINT Pts )
 { 
   INT i, dx, dy;
   DOUBLE len, si, co;
   static POINT pt[] =
   {
-    {-10, 50}, {-40, 100}, {300, 30} 
+    {50, 200}, {-30, 200}, {300, 0}
   };
   POINT pt1[sizeof (pt) / sizeof(pt[0])];
 
@@ -119,7 +119,7 @@ VOID Draw( HDC hDC, INT X, INT Y, POINT Pts )
   SelectObject(hDC, GetStockObject(DC_PEN));
   SetDCPenColor(hDC, RGB(rand(), rand(), rand()));
   SelectObject(hDC, GetStockObject(DC_BRUSH));
-  SetDCBrushColor(hDC, RGB(rand(), rand(), rand()));
+  SetDCBrushColor(hDC, RGB(12, 0, 0));
   Polygon(hDC, pt1, sizeof(pt1) / sizeof(pt1[0]));
 }
 
@@ -127,16 +127,18 @@ VOID Draw( HDC hDC, INT X, INT Y, POINT Pts )
 VOID DrawTrail( HWND hWnd, HDC hDC )
 {
   POINT p;
-  INT i;
-
+  INT i, j;
+                                                         
   GetCursorPos(&p);
+  SetCursorPos(24 * sin(clock()), sin(clock()) * 230);
   ScreenToClient(hWnd, &p);
-  srand(30);
-  for (i = 0; i < 300; i++)
-    Draw(hDC, rand() % 2000, rand() % 1000, p);
+  srand(62);
+  for (i = 0; i < 1500; i++)
+    Draw(hDC, 500, rand(), p);
 }
+/* End of 'DrawTrail' function */
 
-/* Start of "MyWinFunc" function */
+/* Start of 'MyWinFunc' function */
 LRESULT CALLBACK MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
 {
   HDC hDC;
@@ -159,7 +161,7 @@ LRESULT CALLBACK MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     hMemDC = CreateCompatibleDC(hDC);
     ReleaseDC(hWnd, hDC);
     return 0;
-  case WM_SIZE:
+  case WM_SIZE:                                                               
     w = LOWORD(lParam);
     h = HIWORD(lParam);
     if (hBm != NULL)
@@ -174,6 +176,7 @@ LRESULT CALLBACK MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     Rectangle(hMemDC, 0, 0, w + 1, h + 1);
     BitBlt(hMemDC, (w - bm.bmWidth) / 2, (h - bm.bmHeight) / 2, bm.bmWidth,
       bm.bmHeight, hMemDCLogo, 0, 0, SRCCOPY);
+
 
     DrawTrail(hWnd, hMemDC);
 
@@ -194,6 +197,6 @@ LRESULT CALLBACK MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     return 0;
   }
   return DefWindowProc(hWnd, Msg, wParam, lParam);
-} /* End of "MyWinFunc" function */
+} /* End of 'MyWinFunc' function */
 
 
