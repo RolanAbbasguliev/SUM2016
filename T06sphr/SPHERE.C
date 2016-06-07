@@ -5,6 +5,7 @@
 #include <windows.h>
 #include <math.h>
 #include "sphere.h"
+#include <stdlib.h>
 
 #pragma warning(disable: 4244)
 
@@ -34,10 +35,9 @@ VOID DrawSphere( HDC hDC, INT Xc, INT Yc, INT R )
   static VEC G[N][M]; 
   DBL theta, phi, phase = clock() / 10000.0;
 
-
   SelectObject(hDC, GetStockObject(DC_PEN));
   SelectObject(hDC, GetStockObject(DC_BRUSH));
-  SetDCPenColor(hDC, RGB(255, 127, 80));
+  SetDCPenColor(hDC, RGB(rand(), rand(), rand()));
   SetDCBrushColor(hDC, RGB(12, 0, 0));
 
   for (i = 0; i < N; i++)
@@ -51,7 +51,7 @@ VOID DrawSphere( HDC hDC, INT Xc, INT Yc, INT R )
       G[i][j].Y = R * sin(theta) * sin(phi);
       G[i][j].Z = R * cos(theta);
 
-      G[i][j] = Rot(G[i][j], 20 * sin(phase));
+      G[i][j] = Rot(G[i][j], - 200 * sin(phase));
     }
   }
   for (i = 0; i < N; i++)
@@ -63,7 +63,7 @@ VOID DrawSphere( HDC hDC, INT Xc, INT Yc, INT R )
       Ellipse(hDC, x - 5, y - 5, x + 5, y + 5);
     }
   }
-  /* Horizontal */
+  /* Horizontal lines */
   for (i= 0; i < N; i++)
    {
      x = Xc + G[i][0].X;
@@ -76,11 +76,11 @@ VOID DrawSphere( HDC hDC, INT Xc, INT Yc, INT R )
        LineTo(hDC, x, y);
      }
    }
-  /* Vertical */ 
+  /* Vertical lines */ 
   for (j = 0; j < M; j++)
   {
-    x = Xc + G[460][j].X;
-    y = Yc - G[400][j].Z;
+    x = Xc + G[0][j].X;
+    y = Yc - G[0][j].Z;
     MoveToEx(hDC, x, y, NULL);
     for (i = 1; i < N; i++)
     {
