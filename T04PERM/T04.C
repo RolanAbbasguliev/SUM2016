@@ -3,7 +3,7 @@
   * Date: 04.05.2016
  */ 
 #include <stdio.h>
-#define N 5                     
+#define N 10                     
 
 int P[N], Parity = 0;
 

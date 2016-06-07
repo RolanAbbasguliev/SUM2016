@@ -4,62 +4,15 @@
  */
 
 #include <stdio.h>
+#include <dos.h>
 #define N 5
-#define max 30
-double A[max][max], sum;
+#define MAX 30
 
-int P[N], Parity = 0;
+double A[MAX][MAX], sum;
 
-/* Start of 'Swap' fuction */
-void Swap( int *A, int *B)
-{
-   int tmp = *A;
-   *A = *B;
-   *B = tmp;
-} 
-/* End of 'Swap' fuction */
+int P[MAX], Parity = 0;
 
-/* Start of 'Go' function */
-void Go( int Pos )
-{
-   int i;
-   double prod = 0;
 
-   if (Pos == N)
-   {
-      for (i = Pos; i < N; i++)
-      prod  *= A[i][P[i]];
-      if (Parity == 0)
-          sum += prod;
-      else
-          sum -= prod;
-      return;
-    }
-   else  
-  {
-     Go(Pos + 1)
-     for (i = Pos; i < N; i++)
-
-     {
-       if (Pos != 1)
-         Swap(&P[Pos], &P[i]), Parity = !Parity;
-       Go(Pos + 1);
-     }
-   }
-}
-/* End of 'Go' function */ 
-
-/* Start of 'LoadMatrix' function */
-void LoadMatrix( char *FileName )
-{
-   int i, j;
-   FILE *F;
-  
-   F = fopen(FileName, "p");
-   if (F == NULL)
-    return;
-   fscanf(F, "%d");
-   for (i = 0; i < N; i++)
      for (j = 0; j < N; j++)
        fscanf(F, "%lf", &A[i][j]);
    fclose(F);
@@ -70,9 +23,9 @@ void LoadMatrix( char *FileName )
 double EvalDeterminant( char *FileName )
 {
    int i;
+
    LoadMatrix(FileName);
    sum = 0;
-
    for (i = 0; i < N; i++)
      P[i] = i;
    Go(0);
@@ -85,13 +38,12 @@ double EvalDeterminant( char *FileName )
 void main( void )
 {
    int i;
-   for (i = 0; i < N; i++)
-     P[i] = i;
-   Go(0);
-   char *M[] =
+   char *M[]=
    {
-     "main. txt"
-
-   
+     "m1.txt"
+   };
+   for (i = 0; i < sizeof(M) / sizeof(M[0]); i++)
+     printf("Det(%d)[%s] = %f\n", i, M[i], EvalDeterminant(M[i]));
+   getch();
 }
 /* End of 'Main' fuction */
