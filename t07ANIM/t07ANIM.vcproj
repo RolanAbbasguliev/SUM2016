@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="T06sphr"
-	ProjectGUID="{6E9C37B4-5D85-4F56-8458-1BC824580896}"
-	RootNamespace="T06sphr"
+	Name="t07ANIM"
+	ProjectGUID="{C4FA2E47-DA2E-4A73-953C-95E0E137676F}"
+	RootNamespace="t07ANIM"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -179,15 +179,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\SPHERE.C"
+				RelativePath=".\MAIN.C"
 				>
 			</File>
 			<File
-				RelativePath=".\SPHERE.h"
+				RelativePath=".\VEC.C"
 				>
 			</File>
 			<File
-				RelativePath=".\T06SPHR.C"
+				RelativePath=".\VEC.H"
 				>
 			</File>
 		</Filter>

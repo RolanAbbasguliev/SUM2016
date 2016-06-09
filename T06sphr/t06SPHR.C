@@ -119,7 +119,7 @@ LRESULT CALLBACK MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     return 0;
   case WM_TIMER:
     Rectangle(hMemDC, 0, 0, w + 1, h + 1);
-    DrawSphere(hMemDC, w / 2, h / 2, 500);
+    DrawSphere(hMemDC, w / 2 , h / 2, 500);
     InvalidateRect(hWnd, NULL, FALSE);
     return 30;
   case WM_PAINT:
