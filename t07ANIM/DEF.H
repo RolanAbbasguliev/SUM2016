@@ -1,6 +1,7 @@
 /*File Name: T07ANIM
  * Programmer: RA3
- * Date: 08.05.2016
+ * Date: 11.05.2016
+ * PURPOSE: Base definitions.
  */
 
 #ifndef __DEF_H_

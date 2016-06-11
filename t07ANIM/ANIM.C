@@ -1,23 +1,70 @@
- /*File Name: T07ANIM
- * Programmer: RA3
- * Date: 11.06.2016
+ /*FILE NAME: ANIM.C
+ * PROGRAMMER: RA3
+ * DATE: 11.06.2016
+ * PURPOSE: Animation system 
  */
-
+#include <stdio.h>
 #include "anim.h"
-#include "def.h"
+#include <mmsystem.h>
+#pragma comment(lib, "winmm")
 
+
+#define RA3_GET_JOYSTIC_AXIR(A) \
+  (2.0 *(ji.dw##A##pos - jc.w##A##min) / (jc.w##A##max - jc.w##A##min - 1) -1)
+
+
+INT RA3_MouseWheel;
+/* Global animation contex */
 ra3Anim RA3_Anim;
+/* Time Local data */
+static UINT64
+  RA3_StartTime,
+  RA3_OldTime,
+  RA3_OldTimeFPS,
+  RA3_PauseTime,
+  RA3_TimerPerSec,
+  RA3_FrameCounter;
 
 VOID RA3_AnimInit( HWND hWnd )
 {
   HDC hDC;
-
-  RA3_Anim.NumOfUnits = 0, memset(&RA3_Anim, 0, sizeof(ra3Anim));
+  LARGE_INTEGER t;
+  memset(&RA3_Anim, 0, sizeof(ra3ANIM));
+  /* Create window and create memory device context */
   RA3_Anim.hWnd = hWnd;
   hDC = GetDC(hWnd);
   RA3_Anim.hDC = CreateCompatibleDC(hDC);
   ReleaseDC(hWnd, hDC);
+  QueryPerformanceFrequency(&t);
+  RA3_TimePerSec = t.QuadPart;
+  QueryPerformanceCounter(&t);
+  RA3_StartTime = RA3_OldTime = RA3_OldTimeFPS = t.QuadPart;
+}/* End of 'RA3_AnimInit' function */
+
+VOID RA3_AnimClose( VOID )
+{
+  int i;
+
+  for (i = 0; i < RA3_Anim.NumOfUnits; i++)
+  {
+    RA3_Anim.Units[i]->Close(RA3_Anim.Units[i], &RA3_Anim);
+    free(RA3_Anim.Units[i]);
+  }
+  RA3_Anim.NumOfUnits = 0;
+  DeleteDC(RA3_Anim.hDC);
+  DeleteObject(RA3_Anim.hFrame);
 }
+
+
+
+
+
+
+
+
+
+
+
 
 VOID RA3_Reasize( INT W, INT H )
 {
@@ -53,19 +100,7 @@ VOID RA3_AnimDoExit( VOID )
   DestroyWindow(RA3_Anim.hWnd);
 }
 
-VOID RA3_AnimClose( VOID )
-{
-  int i;
 
-  for (i = 0; i < RA3_Anim.NumOfUnits; i++)
-  {
-    RA3_Anim.Units[i]->Close(RA3_Anim.Units[i], &RA3_Anim);
-    free(RA3_Anim.Units[i]);
-  }
-  DeleteDC(RA3_Anim.hDC);
-  DeleteObject(RA3_Anim.hFrame);
-  RA3_Anim.NumOfUnits = 0;
-}
 /* The start of 'PutLinetime' function */
 VOID PutLineTime( HDC hDC, INT X, INT Y, INT X1, INT Y1 )
 {
