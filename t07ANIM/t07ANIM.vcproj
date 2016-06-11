@@ -190,16 +190,6 @@
 				RelativePath=".\UNIT.C"
 				>
 			</File>
-			<File
-				RelativePath=".\VEC.C"
-				>
-			</File>
-			<Filter
-				Name="Resource Files"
-				Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-				UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-				>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -214,10 +204,24 @@
 				RelativePath=".\DEF.H"
 				>
 			</File>
-			<File
-				RelativePath=".\VEC.H"
+			<Filter
+				Name="MATH"
 				>
-			</File>
+				<File
+					RelativePath=".\VEC.C"
+					>
+				</File>
+				<File
+					RelativePath=".\VEC.H"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="Resource Files"
+			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
+			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
+			>
 		</Filter>
 	</Files>
 	<Globals>

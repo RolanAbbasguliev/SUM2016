@@ -358,8 +358,7 @@ __inline DBL Rnd0( VOID )
  */
 __inline DBL Rnd1( VOID )
 {
-  return 2.0 * rand() / RAND_MAX - 1;
+  return 2.0 * rand() / RAND_MAX - 1;   	
 } /* End of 'Rnd1' function */
-
-
 #endif
+

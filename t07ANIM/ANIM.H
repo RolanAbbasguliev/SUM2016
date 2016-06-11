@@ -1,47 +1,51 @@
- /*File Name: T07ANIM
- * Programmer: RA3
+/*File Name: T07ANIM
+   * Programmer: RA3
  * Date: 10.06.2016
  */
 
-typedef struct tagvg4UNIT vg4UNIT;
-typedef struct
+
+#ifndef __ANIM_H_
+#define __ANIM_H_
+
+#pragma warning (disable: 4244)
+#define RA3_MAX_UNITS 100
+
+#include "def.h"
+
+typedef struct tagra3UNIT ra3UNIT;
+typedef struct 
 {
-  . . . vg4UNIT * ...
-} vg4ANIM;
-struct tagvg4UNIT
+  HWND hWnd;
+  HDC hDC;  
+  INT W, H;  
+  HBITMAP hFrame;
+  ra3UNIT *Units[RA3_MAX_UNITS];
+  INT NumOfUnits;
+  /* Timer data */
+  DBL
+    GlobalTime, GlobalDeltaTime,
+    Time, DeltaTime,
+    FPS;
+  BOOL IsPause;
+  /*Input system */
+  INT Mx, M
+} ra3Anim;
+struct tagra3UNIT
 {
-  . . . vg4ANIM . . .
+  VOID (*Init)( ra3UNIT *Uni, ra3Anim *Ani );
+  VOID (*Close)( ra3UNIT *Uni, ra3Anim *Ani );
+  VOID (*Response)( ra3UNIT *Uni, ra3Anim *Ani );
+  VOID (*Render)( ra3UNIT *Uni, ra3Anim *Ani );
 };
 
+extern ra3Anim ra3_Anim;
 
-... VG4_Anim ...
-... VG4_Unit ...
-
-
-
-
-VOID VG4_AnimClose( VOID )
-{
-  for (i = 0; i < VG4_Anim.NumOfUnits; i++)
-  {
-    VG4_Anim.Units[i]->Close(VG4_Anim.Units[i], &VG4_Anim);
-    free(VG4_Anim.Units[i]);
-  }
-  VG4_Anim.NumOfUnits = 0;
-  . . .
-}
-
-VOID VG4_AnimRender( VOID )
-{
-  /  (kbd, mouse, joystick)
-  for (i = 0; i < VG4_Anim.NumOfUnits; i++)
-    VG4_Anim.Units[i]->Response(VG4_Anim.Units[i], &VG4_Anim);
-
-  //Erase Frame
-  for (i = 0; i < VG4_Anim.NumOfUnits; i++)
-  {
-    . . .// можно сбросить все кисти и перья
-    VG4_Anim.Units[i]->Render(VG4_Anim.Units[i], &VG4_Anim);
-  }
-  . . .
-}
+VOID ra3_AnimCopyFrame( HDC hDC );
+VOID ra3_AnimInit( HWND hWnd );
+VOID ra3_AnimAddUnit( ra3UNIT *Uni );
+VOID ra3_AnimClose( VOID );
+VOID ra3_Reasize( INT W, INT H );
+VOID ra3_AnimRender( VOID );
+VOID ra3_AnimDoExit( VOID );
+ra3UNIT * ra3_AnimUnitCreate( INT Size );
+#endif

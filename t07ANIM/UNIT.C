@@ -1,122 +1,82 @@
 /*File Name: T07ANIM
  * Programmer: RA3
  * Date: 10.06.2016
+ * PURPOSE: WinAPI windowed applictaion sample
  */
+
 #include "anim.h"
-typedef struct tagvg4UNIT vg4UNIT;
-struct tagvg4UNIT
-{
-  /* Unit initialization function.
-   * ARGUMENTS:
-   *   - self-pointer to unit object:
-   *       vg4UNIT *Uni;
-   *   - animation context:
-   *       vg4ANIM *Ani;
-   * RETURNS: None.
-   */
-  VOID (*Init)( vg4UNIT *Uni, vg4ANIM *Ani );
-
-  /* Unit deinitialization function.
-   * ARGUMENTS:
-   *   - self-pointer to unit object:
-   *       vg4UNIT *Uni;
-   *   - animation context:
-   *       vg4ANIM *Ani;
-   * RETURNS: None.
-   */
-  VOID (*Close)( vg4UNIT *Uni, vg4ANIM *Ani );
-
-  /* Unit inter frame events handle function.
-   * ARGUMENTS:
-   *   - self-pointer to unit object:
-   *       vg4UNIT *Uni;
-   *   - animation context:
-   *       vg4ANIM *Ani;
-   * RETURNS: None.
-   */
-  VOID (*Response)( vg4UNIT *Uni, vg4ANIM *Ani );
-
-  /* Unit render function.
-   * ARGUMENTS:
-   *   - self-pointer to unit object:
-   *       vg4UNIT *Uni;
-   *   - animation context:
-   *       vg4ANIM *Ani;
-   * RETURNS: None.
-   */
-  VOID (*Render)( vg4UNIT *Uni, vg4ANIM *Ani );
-};
-
+#include "def.h"
+#include "vec.h"
 /* Unit initialization function.
  * ARGUMENTS:
  *   - self-pointer to unit object:
- *       vg4UNIT *Uni;
+ *       ra3UNIT *Uni;
  *   - animation context:
- *       vg4ANIM *Ani;                                            
- * RETURNS: None.                                                
- */                                                               
-static VOID VG4_UnitInit( vg4UNIT *Uni, vg4ANIM *Ani )            
-{                                                                 
-} /* End of 'VG4_UnitInit' function */                            
-                                                                  
-/* Unit deinitialization function.                                
- * ARGUMENTS:                                                     
- *   - self-pointer to unit object:                               
- *       vg4UNIT *Uni;                                             
- *   - animation context:                                           
- *       vg4ANIM *Ani;                                              
- * RETURNS: None.                                                   
+ *       RA3ANIM *Ani;
+ * RETURNS: None.
  */
-static VOID VG4_UnitClose( vg4UNIT *Uni, vg4ANIM *Ani )
+static VOID RA3_UnitInit( ra3UNIT *Uni, ra3Anim *Ani )
 {
-} /* End of 'VG4_UnitClose' function */
+} /* End of 'RA3_UnitInit' function */
+
+
+/* Unit deinitialization function.
+ * ARGUMENTS:
+ *   - self-pointer to unit object:
+ *       RA3UNIT *Uni;
+ *   - animation context:
+ *       RA3ANIM *Ani;
+ * RETURNS: None.
+ */
+static VOID RA3_UnitClose( ra3UNIT *Uni, ra3Anim *Ani )
+{
+} /* End of 'RA3_UnitClose' function */
 
 /* Unit inter frame events handle function.
  * ARGUMENTS:
  *   - self-pointer to unit object:
- *       vg4UNIT *Uni;
+ *       ra3UNIT *Uni;
  *   - animation context:
- *       vg4ANIM *Ani;
+ *       ra3ANIM *Ani;
  * RETURNS: None.
  */
-static VOID VG4_UnitResponse( vg4UNIT *Uni, vg4ANIM *Ani );   
+static VOID RA3_UnitResponse( ra3UNIT *Uni, ra3Anim *Ani )
 {
-} /* End of 'VG4_UnitResponse' function */
+} /* End of 'ra3_UnitResponse' function */
 
 /* Unit render function.
  * ARGUMENTS:
  *   - self-pointer to unit object:
- *       vg4UNIT *Uni;
+ *       ra3UNIT *Uni;
  *   - animation context:
- *       vg4ANIM *Ani;
+ *       ra3ANIM *Ani;
  * RETURNS: None.
  */
-static VOID VG4_UnitRender( vg4UNIT *Uni, vg4ANIM *Ani )
+static VOID RA3_UnitRender( ra3UNIT *Uni, ra3Anim *Ani )
 {
-} /* End of 'VG4_UnitRender' function */
-
-- основная функция создания объекта анимации по умолчанию:
+} /* End of 'ra3_UnitRender' function */
 
 /* Unit creation function.
  * ARGUMENTS:
  *   - unit structure size in bytes:
  *       INT Size;
  * RETURNS:
- *   (vg4UNIT *) pointer to created unit.
- */
-vg4UNIT * VG4_AnimUnitCreate( INT Size )
+ *   (ra3UNIT *) pointer to created units */
+ra3UNIT * RA3_AnimUnitCreate( INT Size )
 {
-  vg4UNIT *Uni;              
+  ra3UNIT *Uni;
 
   /* Memory allocation */
-  if (Size < sizeof(vg4UNIT) ||
+  if (Size < sizeof(ra3UNIT) ||
       (Uni = malloc(Size)) == NULL)
     return NULL;
   memset(Uni, 0, Size);
   /* Setup unit methods */
-  Uni->Init = VG4_UnitInit;
-  Uni->Close = VG4_UnitClose;
-  Uni->Response = VG4_UnitResponse;
-  Uni->Render = VG4_UnitRender;
+  Uni->Init = RA3_UnitInit;
+  Uni->Close = RA3_UnitClose;
+  Uni->Response = RA3_UnitResponse;
+  Uni->Render = RA3_UnitRender;
   return Uni;
-} /* End of 'VG4_AnimUnitCreate' function */
+} /* End of 'ra3_AnimUnitCreate' function */
+
+

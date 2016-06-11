@@ -1,41 +1,87 @@
-/*File Name: T07ANIM
+ /*File Name: T07ANIM
  * Programmer: RA3
- * Date: 10.05.2016
+ * Date: 11.06.2016
  */
 
-#include "vec.h"
+#include "anim.h"
 #include "def.h"
 
-ANIM.C - VG4_Anim***
-  VG4_AnimInit(hWnd){
-}
+ra3Anim RA3_Anim;
 
-VG4_AnimClose(){
-}
-
-VG4_AnimResize(W, H){
-}
-
-VG4_AnimCopyFrame(HDC){
-}
-
-VG4_AnimRender(){
-}
-
-VG4_AnimAddUnit(Uni){
-}
- VG4_Anim  //Global patametr - structur of animation contex 
-vg4ANIM:
-typedef struct
+VOID RA3_AnimInit( HWND hWnd )
 {
-  HWND hWnd; //window 
-  HDC hDC;   //contex in memory
-  INT W, H;  //size of window 
-  HBITMAP hFrame; //picture of frame- картинка кадра
-  vg4UNIT *Units[VG4_MAX_UNITS]; //massive of animation abstacts - массив объектов анимации
-  INT NumOfUnits; - //numbers of animation текущее количество объектов анимации
-} vg4ANIM;
+  HDC hDC;
 
+  RA3_Anim.NumOfUnits = 0, memset(&RA3_Anim, 0, sizeof(ra3Anim));
+  RA3_Anim.hWnd = hWnd;
+  hDC = GetDC(hWnd);
+  RA3_Anim.hDC = CreateCompatibleDC(hDC);
+  ReleaseDC(hWnd, hDC);
+}
 
+VOID RA3_Reasize( INT W, INT H )
+{
+  HDC hDC;
+  
+  RA3_Anim.W = W;
+  RA3_Anim.H = H;
 
+  if (RA3_Anim.hFrame != NULL)
+    DeleteObject(RA3_Anim.hFrame);
+  hDC = GetDC(RA3_Anim.hWnd);
+  RA3_Anim.hFrame = CreateCompatibleBitmap(hDC, W, H);
+  ReleaseDC(RA3_Anim.hWnd, hDC);
+  SelectObject(RA3_Anim.hDC, RA3_Anim.hFrame);
+}
+
+VOID RA3_AnimCopyFrame( HDC hDC )
+{
+  BitBlt(hDC, 0, 0, RA3_Anim.W, RA3_Anim.H, RA3_Anim.hDC, 0, 0, SRCCOPY);
+}
+
+VOID RA3_AnimAddUnit( ra3UNIT *Uni )
+{
+  if (ra3_Anim.NumOfUnits < MAX_UNITS)
+  {  
+    ra3_Anim.Units[ra3_Anim.NumOfUnits++] = Uni;
+    Uni->Init(Uni, &ra3_Anim);
+  }
+}
+
+VOID RA3_AnimDoExit( VOID )
+{
+  DestroyWindow(RA3_Anim.hWnd);
+}
+
+VOID RA3_AnimClose( VOID )
+{
+  int i;
+
+  for (i = 0; i < RA3_Anim.NumOfUnits; i++)
+  {
+    RA3_Anim.Units[i]->Close(RA3_Anim.Units[i], &RA3_Anim);
+    free(RA3_Anim.Units[i]);
+  }
+  DeleteDC(RA3_Anim.hDC);
+  DeleteObject(RA3_Anim.hFrame);
+  RA3_Anim.NumOfUnits = 0;
+}
+/* The start of 'PutLinetime' function */
+VOID PutLineTime( HDC hDC, INT X, INT Y, INT X1, INT Y1 )
+{
+  MoveToEx(hDC, X, Y, NULL); 
+  LineTo(hDC, X1, Y1);
+}/* The end of 'PutLinetime' function */
+VOID RA3_AnimRender( VOID )
+{
+  int i;
+
+  for (i = 0; i < RA3_Anim.NumOfUnits; i++)
+    RA3_Anim.Units[i]->Response(RA3_Anim.Units[i], &RA3_Anim);
+
+  for (i = 0; i < RA3_Anim.NumOfUnits; i++)
+  {
+    RA3_Anim.Units[i]->Render(RA3_Anim.Units[i], &RA3_Anim);
+  }
+}
 
