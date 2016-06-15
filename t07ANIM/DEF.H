@@ -1,12 +1,11 @@
-/*File Name: T07ANIM
+/*File Name: DEF.H
  * Programmer: RA3
  * Date: 11.05.2016
  * PURPOSE: Base definitions.
  */
 
-#ifndef __DEF_H_
+#ifndef __DEF_H_ 
 #define __DEF_H_
-
 
 #include <windows.h>
 
@@ -23,8 +22,6 @@
 
 #include "vec.h"
 #include <stdlib.h>
-
-/* !!! в начале WinMain: SetDbgMemHooks(); */
 
 typedef FLOAT FLT;
 typedef DOUBLE DBL;

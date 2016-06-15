@@ -1,15 +1,15 @@
-/* File Name: T07ANIM
+/* File Name: MAIN.C
  * Programmer: RA3
  * Date: 11.06.2016
  * PURPOSE: Animation project.
                Main startup module.
  */
 
-#include "vec.h"
 #include <windows.h>
 #include "units.h"
 #include "anim.h"
-#define RA3_WND_CLASS
+
+#define RA3_WND_CLASS_NAME "My Window Class"
 
 /* Forward references */
 LRESULT CALLBACK RA3_MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam );
@@ -27,16 +27,12 @@ LRESULT CALLBACK RA3_MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lPara
  * RETURNS:
  *  (INT) Erro
  */
-INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine, INT ShowCmd )
+INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine, INT CmdShow )
 {
-  MSG msg;
-  HWND hWnd;
   WNDCLASS wc;
-  /* Register class */
- 
-  SetDbgMemHooks();
-  
-  /* Create window class */ 
+  HWND hWnd;
+  MSG msg;
+
   wc.style = CS_HREDRAW | CS_VREDRAW;
   wc.cbClsExtra = 0;
   wc.cbWndExtra = 0;
@@ -44,37 +40,32 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine, 
   wc.hIcon = LoadIcon(NULL, IDI_EXCLAMATION);
   wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
   wc.hInstance = hInstance;
-  wc.lpszClassName = "My Window Class";
+  wc.lpszClassName = RA3_WND_CLASS_NAME;
   wc.lpszMenuName = NULL;
-  wc.lpfnWndProc = MyWinFunc;
+  wc.lpfnWndProc = RA3_MyWinFunc;
 
   if (!RegisterClass(&wc))
   {
     MessageBox(NULL, "Error register window class", "ERROR", MB_OK | MB_ICONERROR);
     return 0;
   }
-  /* Create window */
-  hWnd = Create Window(RA3_WND_CLASS_NAME,
-    "My Firsm Animation  >:D", WS_OVERLAPPED, CW_USEDEFAULT, CW_USEDEFAULT,
-    CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInstance, NULL);
-  
-  /* Show window */
-  ShowWindow(hWnd, SW_SHOWNORMAL);
-  UpdateWindow(hWnd);
-  // Add Units 
-  /*             */
-  
-  /*Run Message loop */
-  while (GetMessage(&msg, NULL, 0, 0))
-    DispatchMessage(&msg);
-  return 30;
-}/* End of 'WinMain' function */
 
+  /* Create window */
+  hWnd = CreateWindow(RA3_WND_CLASS_NAME, "MY first Animation System <[=-=]>", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInstance, NULL);
+  if (hWnd == NULL)
+  {
+    MessageBox(NULL, "Create window erroe", "ERROR", MB_OK | MB_ICONERROR);
+    return 0;
+  }
+  /* Show window */
+  ShowWindow(hWnd, CmdShow);
+  /* Run message loop */
   while (GetMessage(&msg, NULL, 0, 0))
     DispatchMessage(&msg);
-  
+
   return 30;
-}/* The end of 'WinMain' function */
+} 
+/* End of "WinMain" function */
 
 /* Window message handle function (CALLBACK version)
  *    - window handle:
@@ -88,7 +79,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR *CmdLine, 
  * RETURNS:
  *   (LRESULT) message return code (depended to Msg type)
  */
-LRESULT CALLBACK MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
+LRESULT CALLBACK RA3_MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
 {
   HDC hDC;
   PAINTSTRUCT ps;
@@ -97,7 +88,7 @@ LRESULT CALLBACK MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
   switch (Msg)
   {
   case WM_GETMINMAXINFO:
-    MinMax = (MINMAXINFO *)Param;
+    MinMax = (MINMAXINFO *)lParam;
     MinMax->ptMaxTrackSize.y =
       GetSystemMetrics(SM_CYMAXTRACK) +
       GetSystemMetrics(SM_CYCAPTION) +
@@ -113,15 +104,9 @@ LRESULT CALLBACK MyWinFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
     SendMessage(hWnd, WM_TIMER, 0, 0);
     return 0;
   case WM_MOUSEWHEEL:
-    RA3_MousWheel += (SHORT)HIWORD(wParam);
-    retrun 0;
-  case WM_ERASEBKGND:           //Cancle draw background 
+    RA3_MouseWheel += (SHORT)HIWORD(wParam);
     return 0;
-  case WM_KEYDOWN:
-    if (LOWORD(wParam) == 'R')
-      FlipFullScreen(hWnd);
-    if (LOWORD(wParam) == VK_ESCAPE)
-      RA3_AnimDoExit();
+  case WM_ERASEBKGND:           //Cancle draw background 
     return 0;
   case WM_TIMER: 
     RA3_AnimRender();

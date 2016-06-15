@@ -1,12 +1,10 @@
-/*File Name: T07ANIM
+/*File Name: UNIT.C
  * Programmer: RA3
  * Date: 10.06.2016
  * PURPOSE: WinAPI windowed applictaion sample
  */
 
 #include "anim.h"
-#include "def.h"
-#include "vec.h"
 /* Unit initialization function.
  * ARGUMENTS:
  *   - self-pointer to unit object:
@@ -15,10 +13,9 @@
  *       RA3ANIM *Ani;
  * RETURNS: None.
  */
-static VOID RA3_UnitInit( ra3UNIT *Uni, ra3Anim *Ani )
+static VOID RA3_UnitInit( ra3UNIT *Uni, ra3ANIM *Ani )
 {
 } /* End of 'RA3_UnitInit' function */
-
 
 /* Unit deinitialization function.
  * ARGUMENTS:
@@ -28,7 +25,7 @@ static VOID RA3_UnitInit( ra3UNIT *Uni, ra3Anim *Ani )
  *       RA3ANIM *Ani;
  * RETURNS: None.
  */
-static VOID RA3_UnitClose( ra3UNIT *Uni, ra3Anim *Ani )
+static VOID RA3_UnitClose( ra3UNIT *Uni, ra3ANIM *Ani )
 {
 } /* End of 'RA3_UnitClose' function */
 
@@ -40,7 +37,7 @@ static VOID RA3_UnitClose( ra3UNIT *Uni, ra3Anim *Ani )
  *       ra3ANIM *Ani;
  * RETURNS: None.
  */
-static VOID RA3_UnitResponse( ra3UNIT *Uni, ra3Anim *Ani )
+static VOID RA3_UnitResponse( ra3UNIT *Uni, ra3ANIM*Ani )
 {
 } /* End of 'ra3_UnitResponse' function */
 
@@ -52,7 +49,7 @@ static VOID RA3_UnitResponse( ra3UNIT *Uni, ra3Anim *Ani )
  *       ra3ANIM *Ani;
  * RETURNS: None.
  */
-static VOID RA3_UnitRender( ra3UNIT *Uni, ra3Anim *Ani )
+static VOID RA3_UnitRender( ra3UNIT *Uni, ra3ANIM *Ani )
 {
 } /* End of 'ra3_UnitRender' function */
 
@@ -78,5 +75,18 @@ ra3UNIT * RA3_AnimUnitCreate( INT Size )
   Uni->Render = RA3_UnitRender;
   return Uni;
 } /* End of 'ra3_AnimUnitCreate' function */
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
