@@ -8,6 +8,7 @@
 
 #include "anim.h"
 #include <mmsystem.h>
+
 #pragma comment(lib, "winmm")
 #pragma comment(lib, "opengl32")
 #pragma comment(lib, "glu32")
@@ -82,17 +83,21 @@ VOID RA3_AnimInit( HWND hWnd )
 
   /* Render setup */
   RA3_RndMatrWorld = MatrIdentity();
-  RA3_RndMatrView = MatrView(VecSet(15, 15, 15), VecSet(0, 0, 0), VecSet(0, 1, 0));
+  RA3_RndMatrView = MatrView(VecSet(5, 5, 5), VecSet(0, 0, 0), VecSet(0, 1, 0));
   RA3_RndMatrProj = MatrFrustum(-1, 1, -1, 1, 1, 100);
 
-  RA3_RndProjDist = 1;
+  RA3_RndProjDist = 0.1;
   RA3_RndFarClip = 500;
-  RA3_RndProjSize = 1;
+  RA3_RndProjSize = 0.1;
 
   /* OpenGL specific initialization */
   glClearColor(0.3, 0.5, 0.7, 1);
   glEnable(GL_DEPTH_TEST);
   /* glPolygonMode(GL_FRONT, GL_LINE); */
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  RA3_RndPrg = RA3_RndShaderLoad("a");
 } /* End of 'RA3_AnimInit' function */
 
 /* Animation system deinitialization function.
@@ -102,6 +107,8 @@ VOID RA3_AnimInit( HWND hWnd )
 VOID RA3_AnimClose( VOID )
 {
   INT i;
+
+  RA3_RndShaderFree(RA3_RndPrg);
 
   /* Destroy all units */
   for (i = 0; i < RA3_Anim.NumOfUnits; i++)
@@ -142,7 +149,7 @@ VOID RA3_AnimResize( INT W, INT H )
  * ARGUMENTS: None.
  * RETURNS: None.
  */
-VOID RA3_AnimCopyFrame( HDC hDC )
+VOID RA3_AnimCopyFrame( VOID )
 {
   SwapBuffers(RA3_Anim.hDC);
 } /* End of 'RA3_AnimCopyFrame' function */
@@ -156,6 +163,7 @@ VOID RA3_AnimRender( VOID )
   INT i;
   POINT pt;
   LARGE_INTEGER t;
+  static DBL ShaderTime;
 
   /*** Handle timer ***/
   RA3_FrameCounter++;
@@ -181,7 +189,7 @@ VOID RA3_AnimRender( VOID )
 
     RA3_Anim.FPS = RA3_FrameCounter * RA3_TimePerSec / (DBL)(t.QuadPart - RA3_OldTimeFPS);
     RA3_OldTimeFPS = t.QuadPart;
-    sprintf(str, "FPS: %.5f", RA3_Anim.FPS);
+    sprintf(str, "FPS: %.5f (%i units)", RA3_Anim.FPS, RA3_Anim.NumOfUnits);
     SetWindowText(RA3_Anim.hWnd, str);
     RA3_FrameCounter = 0;
   }
@@ -250,6 +258,36 @@ VOID RA3_AnimRender( VOID )
   /* Clear background */
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+  /*** Draw debug grid ***/
+  if (1)
+  {
+    MATR M = MatrMulMatr(RA3_RndMatrView, RA3_RndMatrProj);
+
+    glUseProgram(0);
+    glLoadMatrixf(M.A[0]);
+    glBegin(GL_LINES);
+      glColor3d(1, 0, 0);
+      glVertex3d(0, 0, 0);
+      glVertex4d(1, 0, 0, 0);
+      glColor3d(0, 1, 0);
+      glVertex3d(0, 0, 0);
+      glVertex4d(0, 1, 0, 0);
+      glColor3d(0, 0, 1);
+      glVertex3d(0, 0, 0);
+      glVertex4d(0, 0, 1, 0);
+
+      glColor3d(0.88, 0.88, 0.88);
+      for (i = -100; i <= 100; i++)
+      {
+        glVertex3d(i, 0, -100);
+        glVertex3d(i, 0, 100);
+
+        glVertex3d(-100, 0, i);
+        glVertex3d(100, 0, i);
+      }
+    glEnd();
+  }
+
   /*** Render all units ***/
   for (i = 0; i < RA3_Anim.NumOfUnits; i++)
   {
@@ -259,12 +297,22 @@ VOID RA3_AnimRender( VOID )
 
   /* Finalize OpenGL drawing */
   glFinish();
+
+  /* Update shaders */
+  ShaderTime += RA3_Anim.GlobalDeltaTime;
+  if (ShaderTime > 3)
+  {
+    ShaderTime = 0;
+
+    RA3_RndShaderFree(RA3_RndPrg);
+    RA3_RndPrg = RA3_RndShaderLoad("a");
+  }
 } /* End of 'RA3_AnimRender' function */
 
 /* Add new unit to animation system function.
  * ARGUMENTS:
  *   - pointer to new unit:
- *       RA3UNIT *Uni;
+ *       ra3UNIT *Uni;
  * RETURNS: None.
  */
 VOID RA3_AnimAddUnit( ra3UNIT *Uni )
@@ -310,8 +358,7 @@ VOID RA3_AnimFlipFullScreen( VOID )
     /* restore window size */
     SetWindowPos(RA3_Anim.hWnd, HWND_TOP,
       SaveRect.left, SaveRect.top,
-      SaveRect.right - SaveRect.left,
-      SaveRect.bottom - SaveRect.top,
+      SaveRect.right - SaveRect.left, SaveRect.bottom - SaveRect.top,
       SWP_NOOWNERZORDER);
   }
   else
@@ -343,4 +390,3 @@ VOID RA3_AnimFlipFullScreen( VOID )
 } /* End of 'RA3_AnimFlipFullScreen' function */
 
 /* END OF 'ANIM.C' FILE */
-

@@ -55,6 +55,13 @@ __inline VEC VecSet( DBL X, DBL Y, DBL Z )
   return r;
 }  /* End of 'VecSet' function */
 
+__inline VEC2 Vec2Set( DBL X, DBL Y)
+{
+  VEC2 r = {X, Y};
+
+  return r;
+}
+
 __inline VEC VecAddVec( VEC A, VEC B )
 {
   return VecSet(A.X + B.X, A.Y + B.Y, A.Z + B.Z);
@@ -80,6 +87,17 @@ __inline VEC VecNeg( VEC A )
   return VecSet(-A.X, -A.Y, -A.Z);
 }
 // End of "VecNeg" function
+
+__inline VEC VecSet1( FLT X )
+{
+  VEC v;
+
+  v.X = X;
+  v.Y = X;
+  v.Z = X;
+
+  return v;
+}
 __inline DBL VecDotVec( VEC A, VEC B )
 {
   return A.X * B.X + A.Y * B.Y + A.Z * B.Z;

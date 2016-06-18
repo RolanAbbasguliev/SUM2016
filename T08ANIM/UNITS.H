@@ -16,19 +16,19 @@
  */
 ra3UNIT * RA3_UnitCreateBall( VOID );
 
-/* Unit clock creation function.
+/* Unit clock creation function.      
  * ARGUMENTS: None.
  * RETURNS:
  *   (ra3UNIT *) pointer to created unit.
  */
 ra3UNIT * RA3_UnitCreateClock( VOID );
 
-/* Unit cube creation function.
+/* Unit luigi creation function.
  * ARGUMENTS: None.
  * RETURNS:
  *   (ra3UNIT *) pointer to created unit.
  */
-ra3UNIT * RA3_UnitCreateCube( VOID );
+ra3UNIT * RA3_UnitCreateMario( VOID );
 
 #endif /* __UNITS_H_ */
 

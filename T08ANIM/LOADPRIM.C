@@ -1,7 +1,6 @@
-
 /* FILE NAME: LOADPRIM.C
  * PROGRAMMER: RA3
- * DATE: 15.06.2016
+ * DATE: 18.06.2016
  * PURPOSE: Render handle functions.
  */
 
@@ -10,32 +9,64 @@
 
 #include "anim.h"
 
-/* Load primitive from '*.g3d' file function.
+/* Load object transform matrix */
+MATR RA3_RndObjLoadMatrix =
+{
+  {
+    {1, 0, 0, 0},
+    {0, 1, 0, 0},
+    {0, 0, 1, 0},
+    {0, 0, 0, 1}
+  }
+};
+
+/* Load object from '*.g3d' file function.
  * ARGUMENTS:
- *   - primitive structure pointer:
- *       ra3PRIM *Pr;
+ *   - object structure pointer:
+ *       ra3OBJ *Obj;
  *   - file name:
  *       CHAR *FileName;
  * RETURNS:
  *   (BOOL) TRUE is success, FALSE otherwise.
  */
-BOOL RA3_RndPrimLoad( ra3PRIM *Pr, CHAR *FileName )
+BOOL RA3_RndObjLoad( ra3OBJ *Obj, CHAR *FileName )
 {
+  INT p, i, NumOfV, NumOfI, NumOfPrimitives;
+  DWORD Sign, size;
   FILE *F;
-  DWORD Sign;
-  INT NumOfPrimitives;
-  CHAR MtlFile[300];
-  INT NumOfP;
-  INT NumOfI;
-  CHAR Mtl[300];
-  INT p;
+  ra3VERTEX *V;
+  INT *I;
+  MATR MInv;
+  CHAR MtlFile[300], Mtl[300];
 
-  memset(Pr, 0, sizeof(ra3PRIM));
+  RA3_RndObjCreate(Obj);
 
   F = fopen(FileName, "rb");
   if (F == NULL)
     return FALSE;
 
+  MInv = MatrTranspose(MatrInverse(RA3_RndObjLoadMatrix));
+
+  /* File structure:
+   *   4b Signature: "G3D\0"    CHAR Sign[4];
+   *   4b NumOfPrimitives       INT NumOfPrimitives;
+   *   300b material file name: CHAR MtlFile[300];
+   *   repeated NumOfPrimitives times:
+   *     4b INT NumOfV; - vertex count
+   *     4b INT NumOfI; - index (triangles * 3) count
+   *     300b material name: CHAR Mtl[300];
+   *     repeat NumOfV times - vertices:
+   *         !!! float point -> FLT
+   *       typedef struct
+   *       {
+   *         VEC  P;  - Vertex position
+   *         VEC2 T;  - Vertex texture coordinates
+   *         VEC  N;  - Normal at vertex
+   *         VEC4 C;  - Vertex color
+   *       } VERTEX;
+   *     repeat (NumOfF / 3) times - facets (triangles):
+   *       INT N0, N1, N2; - for every triangle (N* - vertex number)
+   */
   fread(&Sign, 4, 1, F);
   if (Sign != *(DWORD *)"G3D")
   {
@@ -44,43 +75,54 @@ BOOL RA3_RndPrimLoad( ra3PRIM *Pr, CHAR *FileName )
   }
   fread(&NumOfPrimitives, 4, 1, F);
   fread(MtlFile, 1, 300, F);
+  RA3_RndLoadMaterials(MtlFile);
+
+  /* Allocate memory for primitives */
+  if ((Obj->Prims = malloc(sizeof(ra3PRIM) * NumOfPrimitives)) == NULL)
+  {
+    fclose(F);
+    return FALSE;
+  }
+  Obj->NumOfPrims = NumOfPrimitives;
+
   for (p = 0; p < NumOfPrimitives; p++)
   {
     /* Read primitive info */
-    fread(&NumOfP, 4, 1, F);
+    fread(&NumOfV, 4, 1, F);
     fread(&NumOfI, 4, 1, F);
     fread(Mtl, 1, 300, F);
 
     /* Allocate memory for primitive */
-    if ((Pr->V = malloc(sizeof(ra3VERTEX) * NumOfP)) == NULL)
+    size = sizeof(ra3VERTEX) * NumOfV + sizeof(INT) * NumOfI;
+    if ((V = malloc(size)) == NULL)
     {
+      while (p-- > 0)
+        RA3_RndPrimFree(&Obj->Prims[p]);
+      free(Obj->Prims);
+      memset(Obj, 0, sizeof(ra3OBJ));
       fclose(F);
       return FALSE;
     }
-    if ((Pr->I = malloc(sizeof(INT) * NumOfI)) == NULL)
-    {
-      free(Pr->V);
-      Pr->V = NULL;
-      fclose(F);
-      return FALSE;
-    }
-    Pr->NumOfV = NumOfP;
-    Pr->NumOfI = NumOfI;
-    fread(Pr->V, sizeof(ra3VERTEX), NumOfP, F);
-    fread(Pr->I, sizeof(INT), NumOfI, F);
-    if (Pr->NumOfV > 0)
-    {
-      INT i;
+    memset(V, 0, size);
+    I = (INT *)(V + NumOfV);
+    /* Read primitive data */
+    fread(V, 1, size, F);
 
-      for (i = 0; i < Pr->NumOfV; i++)
-        Pr->V[i].C = Vec4Set(Pr->V[i].N.X / 2 + 0.5,
-                             Pr->V[i].N.Y / 2 + 0.5,
-                             Pr->V[i].N.Z / 2 + 0.5, 1); /* VecSet(Rnd0(), Rnd0(), Rnd0(), 1); */
+    /* Transform vertex */
+    for (i = 0; i < NumOfV; i++)
+    {
+      V[i].P = VecMulMatr(V[i].P, RA3_RndObjLoadMatrix);
+      V[i].N = VecMulMatr(V[i].N, MInv);
     }
-    break;
+
+    RA3_RndPrimCreate(&Obj->Prims[p], V, NumOfV, I, NumOfI);
+    Obj->Prims[p].MtlNo = RA3_RndFindMaterial(Mtl);
+    Obj->Prims[p].Id = p;
+
+    free(V);
   }
   fclose(F);
   return TRUE;
-} /* End of 'RA3_RndPrimLoad' function */
+} /* End of 'RA3_RndObjLoad' function */
 
 /* END OF 'LOADPRIM.C' FILE */

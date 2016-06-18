@@ -36,7 +36,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
   if (!RegisterClass(&wc))
   {
-    MessageBox(NULL, "Error register window class", "ERROR", MB_OK | MB_ICONERROR);
+    MessageBox(NULL, "Error register window class", "ERROR", MB_OK | MB_ICONMASK);
     return 0;
   }
   /* Create window */
@@ -46,8 +46,6 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
                              CW_USEDEFAULT, CW_USEDEFAULT,
                              NULL, NULL, hInstance, NULL);
 
-
-
   ShowWindow(hWnd, SW_SHOWNORMAL);
   UpdateWindow(hWnd);
 
@@ -56,10 +54,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
   /* RA3_AnimAddUnit(RA3_UnitCreateClock()); */
 
   /* Run message loop */
-  RA3_AnimAddUnit(RA3_UnitCreateBall());
-  RA3_AnimAddUnit(RA3_UnitCreateCube());
-
-  while (GetMessage(&msg, NULL, 0, 0))
+ while (GetMessage(&msg, NULL, 0, 0))
     DispatchMessage(&msg);
   return 30;
 } /* End of 'WinMain' function */

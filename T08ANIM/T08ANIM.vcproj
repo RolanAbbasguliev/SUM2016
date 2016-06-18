@@ -183,6 +183,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GRID.C"
+				>
+			</File>
+			<File
 				RelativePath=".\IMAGE.C"
 				>
 			</File>
@@ -195,7 +199,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MTL.C"
+				>
+			</File>
+			<File
+				RelativePath=".\OBJ3D.C"
+				>
+			</File>
+			<File
+				RelativePath=".\PRIM.C"
+				>
+			</File>
+			<File
 				RelativePath=".\RENDER.C"
+				>
+			</File>
+			<File
+				RelativePath=".\SHADERS .C"
 				>
 			</File>
 			<File
@@ -207,7 +227,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\U_CUBE.C"
+				RelativePath=".\U_LUIGI.C"
+				>
+			</File>
+			<File
+				RelativePath=".\U_MARIO.C"
 				>
 			</File>
 			<File
